@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 
 //Import Routes
+const authRoutes = require('./routes/auth');
 
 //Configure Body Parser
 app.use(express.json());
@@ -14,5 +15,6 @@ app.use(express.json());
 app.use(cors());
 
 //Configure Routes
+app.use('/api', authRoutes);
 
 module.exports = app;
