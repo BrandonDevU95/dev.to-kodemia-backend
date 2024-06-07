@@ -6,5 +6,7 @@ const api = express.Router();
 
 api.post('/posts', userAuth, PostController.createPost);
 api.get('/posts', PostController.getAllPosts);
+api.get('/posts/:id', PostController.getPostById);
+api.patch('/posts/:id', userAuth, PostController.updatePost);
 
 module.exports = api;
