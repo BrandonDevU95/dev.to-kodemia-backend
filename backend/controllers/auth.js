@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { encryptPassword } = require('../utils/authPass');
+const { encryptPassword, verifyPassword } = require('../utils/authPass');
 const { validateUser } = require('../schemas/user');
 const jwt = require('../utils/jwt');
 
@@ -56,6 +56,46 @@ async function signup(req, res) {
 	}
 }
 
+async function login(req, res) {
+	const { username, password } = req.body;
+
+	if (!username || !password) {
+		return res
+			.status(400)
+			.json({ error: 'Username/Email and password are required' });
+	}
+
+	const loginField = username.includes('@')
+		? { email: username.toLowerCase() }
+		: { username: username.toLowerCase() };
+
+	try {
+		const user = await User.findOne(loginField);
+
+		if (!user) {
+			return res.status(400).json({ error: 'Invalid credentials' });
+		}
+
+		const isValidPassword = await verifyPassword(password, user.password);
+
+		if (!isValidPassword) {
+			return res.status(400).json({ error: 'Invalid credentials' });
+		}
+
+		const accessToken = jwt.generateToken(user);
+		const refreshToken = jwt.generateRefreshToken(user);
+
+		res.status(200).json({
+			message: 'Login successful',
+			accessToken,
+			refreshToken,
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: 'Internal Server Error' });
+	}
+}
 module.exports = {
 	signup,
+	login,
 };
