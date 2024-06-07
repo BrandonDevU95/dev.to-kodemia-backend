@@ -1,5 +1,6 @@
+const post = require('../models/post');
 const Post = require('../models/post');
-const { validatePost } = require('../schemas/post');
+const { validatePost, validatePostPartial } = require('../schemas/post');
 
 const createPost = async (req, res) => {
 	const { user_id } = req.user;
@@ -40,4 +41,54 @@ const getAllPosts = async (req, res) => {
 	}
 };
 
-module.exports = { createPost, getAllPosts };
+const getPostById = async (req, res) => {
+	const { id } = req.params;
+
+	try {
+		const post = await Post.findById(id);
+
+		if (!post) {
+			return res.status(404).json({ error: 'Post not found' });
+		}
+
+		res.status(200).json(post);
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+};
+
+const updatePost = async (req, res) => {
+	const { id } = req.params;
+	const postFields = req.body;
+
+	if (!id) {
+		return res.status(400).json({ error: 'Post ID is required' });
+	}
+
+	postFields.updated_at = new Date(postFields.updated_at);
+	delete postFields.author;
+
+	const postData = validatePostPartial(postFields);
+
+	if (!postData.success) {
+		return res
+			.status(400)
+			.json({ error: JSON.parse(postData.error.message) });
+	}
+
+	try {
+		const post = await Post.findByIdAndUpdate({ _id: id }, postData.data, {
+			new: true,
+		});
+
+		if (!post) {
+			return res.status(404).json({ error: 'Post not found' });
+		}
+
+		res.status(200).json({ message: 'Post updated successfully!' });
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+};
+
+module.exports = { createPost, getAllPosts, getPostById, updatePost };
