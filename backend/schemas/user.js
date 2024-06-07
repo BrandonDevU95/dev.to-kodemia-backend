@@ -2,14 +2,18 @@ const z = require('zod');
 
 const userSchema = z.object({
 	name: z.object({
-		firstname: z.string({
-			required_error: 'Firstname is required',
-			invalid_type_error: 'Firstname must be a string',
-		}),
-		lastname: z.string({
-			required_error: 'Lastname is required',
-			invalid_type_error: 'Lastname must be a string',
-		}),
+		firstname: z
+			.string({
+				required_error: 'Firstname is required',
+				invalid_type_error: 'Firstname must be a string',
+			})
+			.min(3, 'Firstname must be at least 3 characters long'),
+		lastname: z
+			.string({
+				required_error: 'Lastname is required',
+				invalid_type_error: 'Lastname must be a string',
+			})
+			.min(3, 'Lastname must be at least 3 characters long'),
 	}),
 	email: z
 		.string({
@@ -28,7 +32,12 @@ const userSchema = z.object({
 			invalid_type_error: 'Username must be a string',
 		})
 		.min(6, 'Username must be at least 6 characters long'),
-	avatar: z.string().url('Invalid URL format').optional(),
+	avatar: z
+		.string({
+			required_error: 'Avatar is required',
+			invalid_type_error: 'Avatar must be a string',
+		})
+		.url('Invalid URL format'),
 	password: z
 		.string({
 			required_error: 'Password is required',
@@ -42,10 +51,26 @@ const userSchema = z.object({
 		.optional(),
 	address: z
 		.object({
-			city: z.string(),
-			number: z.number().int('Number must be an integer'),
-			street: z.string(),
-			zipcode: z.number().int('Zipcode must be an integer'),
+			city: z.string({
+				required_error: 'City is required',
+				invalid_type_error: 'City must be a string',
+			}),
+			number: z
+				.number({
+					required_error: 'Number is required',
+					invalid_type_error: 'Number must be a number',
+				})
+				.int('Number must be an integer'),
+			street: z.string({
+				required_error: 'Street is required',
+				invalid_type_error: 'Street must be a string',
+			}),
+			zipcode: z
+				.number({
+					required_error: 'Zipcode is required',
+					invalid_type_error: 'Zipcode must be a number',
+				})
+				.int('Zipcode must be an integer'),
 		})
 		.optional(),
 	created_at: z.date().default(() => new Date()),
