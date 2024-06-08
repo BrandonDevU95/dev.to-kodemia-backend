@@ -1,4 +1,4 @@
-const jwt = require('../utils/jwt');
+const jwt = require('../lib/jwt');
 const createError = require('http-errors');
 
 function userAuth(req, res, next) {

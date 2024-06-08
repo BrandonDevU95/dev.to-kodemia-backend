@@ -1,7 +1,7 @@
 const User = require('../models/user');
-const { encryptPassword, verifyPassword } = require('../utils/authPass');
+const { encryptPassword, verifyPassword } = require('../lib/authPass');
 const { validateUser } = require('../schemas/user');
-const jwt = require('../utils/jwt');
+const jwt = require('../lib/jwt');
 const createError = require('http-errors');
 
 async function signup(req, res) {
