@@ -7,6 +7,7 @@ const app = express();
 const authRoutes = require('./router/auth');
 const userRoutes = require('./router/user');
 const postRoutes = require('./router/post');
+const bookmarkRoutes = require('./router/bookmark');
 
 //Configure Body Parser
 app.use(express.json());
@@ -20,5 +21,6 @@ app.use(cors());
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', postRoutes);
+app.use('/api', bookmarkRoutes);
 
 module.exports = app;
