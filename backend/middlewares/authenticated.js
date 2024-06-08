@@ -1,4 +1,5 @@
 const jwt = require('../utils/jwt');
+const createError = require('http-errors');
 
 function userAuth(req, res, next) {
 	//Recibe los token por headers
@@ -6,9 +7,7 @@ function userAuth(req, res, next) {
 	const refreshToken = req.headers['refresh-token'];
 
 	if (!accessToken && !refreshToken) {
-		return res
-			.status(401)
-			.json({ error: 'Unauthorized: Token is required' });
+		throw createError(401, 'Unauthorized: No token provided');
 	}
 
 	try {
@@ -34,9 +33,10 @@ function userAuth(req, res, next) {
 				!refreshTokenPayload ||
 				refreshTokenPayload.exp <= currentTime
 			) {
-				return res
-					.status(401)
-					.json({ error: 'Token has expired. Please log in again.' });
+				throw createError(
+					401,
+					'Token has expired. Please log in again.'
+				);
 			} else {
 				// Generamos un nuevo access token
 				const newAccessToken = jwt.generateToken({
@@ -52,7 +52,7 @@ function userAuth(req, res, next) {
 		req.user = accessTokenPayload;
 		next();
 	} catch (error) {
-		return res.status(403).json({ error: 'Forbidden: Invalid token' });
+		throw createError(403, 'Forbidden: Invalid token');
 	}
 }
 

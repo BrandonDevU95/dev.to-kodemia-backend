@@ -2,20 +2,19 @@ const User = require('../models/user');
 const { encryptPassword, verifyPassword } = require('../utils/authPass');
 const { validateUser } = require('../schemas/user');
 const jwt = require('../utils/jwt');
+const createError = require('http-errors');
 
 async function signup(req, res) {
 	const userFields = validateUser(req.body);
 
 	if (!userFields.success) {
-		return res
-			.status(400)
-			.json({ error: JSON.parse(userFields.error.message) });
+		throw createError(400, JSON.parse(userFields.error.message));
 	}
 
 	const hashedPassword = await encryptPassword(userFields.data.password);
 
 	if (hashedPassword.error) {
-		return res.status(500).json({ error: hashedPassword.message });
+		throw createError(500, hashedPassword.message);
 	}
 
 	const tempUser = {
@@ -49,9 +48,9 @@ async function signup(req, res) {
 				errorMessage = 'Duplicate field error.';
 			}
 
-			res.status(400).json({ error: errorMessage });
+			throw createError(400, errorMessage);
 		} else {
-			res.status(500).json({ error: 'Internal Server Error' });
+			throw createError(500, 'Internal Server Error');
 		}
 	}
 }
@@ -60,9 +59,7 @@ async function login(req, res) {
 	const { username, password } = req.body;
 
 	if (!username || !password) {
-		return res
-			.status(400)
-			.json({ error: 'Username/Email and password are required' });
+		throw createError(400, 'Username/Email and password are required');
 	}
 
 	const loginField = username.includes('@')
@@ -73,13 +70,13 @@ async function login(req, res) {
 		const user = await User.findOne(loginField);
 
 		if (!user) {
-			return res.status(400).json({ error: 'Invalid credentials' });
+			throw createError(400, 'Invalid credentials');
 		}
 
 		const isValidPassword = await verifyPassword(password, user.password);
 
 		if (!isValidPassword) {
-			return res.status(400).json({ error: 'Invalid credentials' });
+			throw createError(400, 'Invalid credentials');
 		}
 
 		const accessToken = jwt.generateToken(user);
@@ -91,9 +88,10 @@ async function login(req, res) {
 			refreshToken,
 		});
 	} catch (error) {
-		return res.status(500).json({ error: 'Internal Server Error' });
+		throw createError(500, 'Internal Server Error');
 	}
 }
+
 module.exports = {
 	signup,
 	login,
