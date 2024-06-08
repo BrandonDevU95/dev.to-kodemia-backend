@@ -52,7 +52,12 @@ function userAuth(req, res, next) {
 		req.user = accessTokenPayload;
 		next();
 	} catch (error) {
-		throw createError(403, 'Forbidden: Invalid token');
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 }
 

@@ -30,7 +30,12 @@ const createBookmark = async (req, res) => {
 			message: 'Bookmark saved successfully!',
 		});
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -48,7 +53,12 @@ const getAllBookmarks = async (req, res) => {
 
 		res.status(200).json(bookmarks);
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -68,7 +78,12 @@ const getBookmarkIdByPost = async (req, res) => {
 
 		res.status(200).json(bookmark);
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -91,7 +106,12 @@ const deleteBookmark = async (req, res) => {
 			message: 'Bookmark deleted successfully!',
 		});
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 

@@ -6,12 +6,15 @@ const encryptPassword = async (password) => {
 	try {
 		const salt = await bcrypt.genSalt(saltRounds);
 		const hashedPassword = await bcrypt.hash(password, salt);
+
 		return hashedPassword;
 	} catch (error) {
-		return {
-			message: 'Password encryption failed',
-			error,
-		};
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -20,10 +23,12 @@ const verifyPassword = async (password, hashedPassword) => {
 		const match = await bcrypt.compare(password, hashedPassword);
 		return match;
 	} catch (error) {
-		return {
-			message: 'Password verification failed',
-			error,
-		};
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 

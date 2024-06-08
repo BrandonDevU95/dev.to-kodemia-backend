@@ -39,6 +39,7 @@ async function signup(req, res) {
 			// Código de error de duplicación
 			const duplicateField = Object.keys(error.keyPattern)[0]; // Obtener el campo duplicado
 			let errorMessage = '';
+			const errorStatus = 409;
 
 			if (duplicateField === 'username') {
 				errorMessage = 'Username already in use.';
@@ -48,9 +49,19 @@ async function signup(req, res) {
 				errorMessage = 'Duplicate field error.';
 			}
 
-			throw createError(400, errorMessage);
+			res.status(errorStatus);
+
+			res.json({
+				succes: false,
+				error: errorMessage,
+			});
 		} else {
-			throw createError(500, 'Internal Server Error');
+			res.status(error.status || 500);
+
+			res.json({
+				succes: false,
+				error: error.message,
+			});
 		}
 	}
 }
@@ -88,7 +99,12 @@ async function login(req, res) {
 			refreshToken,
 		});
 	} catch (error) {
-		throw createError(500, 'Internal Server Error');
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 }
 

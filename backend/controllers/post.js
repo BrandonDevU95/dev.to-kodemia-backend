@@ -21,7 +21,12 @@ const createPost = async (req, res) => {
 		await post.save();
 		res.status(201).json({ message: 'Post created successfully!' });
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -35,7 +40,12 @@ const getAllPosts = async (req, res) => {
 
 		res.status(200).json(posts);
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -51,7 +61,12 @@ const getPostById = async (req, res) => {
 
 		res.status(200).json(post);
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -83,7 +98,12 @@ const updatePost = async (req, res) => {
 
 		res.status(200).json({ message: 'Post updated successfully!' });
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
@@ -103,7 +123,12 @@ const deletePost = async (req, res) => {
 
 		res.status(200).json({ message: 'Post deleted successfully!' });
 	} catch (error) {
-		throw createError(400, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 

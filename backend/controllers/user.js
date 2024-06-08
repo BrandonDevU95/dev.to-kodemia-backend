@@ -14,7 +14,12 @@ const getUserById = async (req, res) => {
 		delete user._doc.password;
 		res.status(200).json(user);
 	} catch (error) {
-		throw createError(500, error.message);
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
 	}
 };
 
