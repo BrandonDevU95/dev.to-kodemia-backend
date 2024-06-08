@@ -5,7 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./router/auth.router');
 const userRoutes = require('./router/user');
 const postRoutes = require('./router/post');
-const bookmarkRoutes = require('./router/bookmark');
+const bookmarkRoutes = require('./router/bookmark.router');
 
 const app = express();
 
