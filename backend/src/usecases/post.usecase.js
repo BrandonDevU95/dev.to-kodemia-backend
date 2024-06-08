@@ -29,7 +29,7 @@ const getAllPosts = async () => {
 		throw createError(404, 'No posts found');
 	}
 
-	res.status(200).json(posts);
+	return posts;
 };
 
 const getPostById = async (id) => {
@@ -39,7 +39,7 @@ const getPostById = async (id) => {
 		throw createError(404, 'Post not found');
 	}
 
-	res.status(200).json(post);
+	return post;
 };
 
 const updatePost = async (id, postData) => {
