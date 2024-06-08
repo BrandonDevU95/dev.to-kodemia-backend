@@ -1,5 +1,5 @@
 const express = require('express');
-const BookmarkController = require('../usecases/bookmark');
+const BookmarkController = require('../usecases/bookmark.usecase');
 const { userAuth } = require('../middlewares/auth.middleware');
 
 const api = express.Router();
