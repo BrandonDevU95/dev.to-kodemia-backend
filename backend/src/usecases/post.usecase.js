@@ -43,16 +43,16 @@ const getPostById = async (id) => {
 };
 
 const updatePost = async (id, postData) => {
-	postFields.updated_at = new Date(postFields.updated_at);
-	delete postFields.author;
+	postData.updated_at = new Date(postData.updated_at);
+	delete postData.author;
 
-	const postData = validatePostPartial(postFields);
+	const postValidated = validatePostPartial(postData);
 
-	if (!postData.success) {
-		throw createError(400, JSON.parse(postData.error.message));
+	if (!postValidated.success) {
+		throw createError(400, JSON.parse(postValidated.error.message));
 	}
 
-	const post = await Post.findByIdAndUpdate({ _id: id }, postData.data, {
+	const post = await Post.findByIdAndUpdate({ _id: id }, postValidated.data, {
 		new: true,
 	});
 
