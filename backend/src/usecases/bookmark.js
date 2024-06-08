@@ -1,5 +1,5 @@
 const Bookmark = require('../models/bookmark.model');
-const { validateBookmark } = require('../schemas/bookmark');
+const { validateBookmark } = require('../schemas/bookmark.schema');
 const createError = require('http-errors');
 
 const createBookmark = async (req, res) => {
