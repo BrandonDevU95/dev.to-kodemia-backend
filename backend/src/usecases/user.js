@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user.model');
 const createError = require('http-errors');
 
 //Para obtener la información de un usuario por id

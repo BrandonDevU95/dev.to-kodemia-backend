@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user.model');
 const { encryptPassword, verifyPassword } = require('../lib/encrypt');
 const { validateUser } = require('../schemas/user');
 const jwt = require('../lib/jwt');
