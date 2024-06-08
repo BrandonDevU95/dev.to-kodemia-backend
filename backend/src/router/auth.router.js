@@ -1,5 +1,5 @@
 const express = require('express');
-const AuthController = require('../usecases/auth');
+const AuthController = require('../usecases/auth.usecase');
 
 const api = express.Router();
 
