@@ -4,8 +4,8 @@ const { validateUser } = require('../schemas/user.schema');
 const jwt = require('../lib/jwt');
 const createError = require('http-errors');
 
-async function signup(req, res) {
-	const userFields = validateUser(req.body);
+async function signup(userData) {
+	const userFields = validateUser(userData);
 
 	if (!userFields.success) {
 		throw createError(400, JSON.parse(userFields.error.message));
@@ -24,51 +24,18 @@ async function signup(req, res) {
 	};
 
 	const userSchema = new User(tempUser);
-	try {
-		const user = await userSchema.save();
-		const accessToken = jwt.generateToken(user);
-		const refreshToken = jwt.generateRefreshToken(user);
+	const user = await userSchema.save();
+	const accessToken = jwt.generateToken(user);
+	const refreshToken = jwt.generateRefreshToken(user);
 
-		return res.status(201).json({
-			user,
-			accessToken,
-			refreshToken,
-		});
-	} catch (error) {
-		if (error.code === 11000) {
-			// Código de error de duplicación
-			const duplicateField = Object.keys(error.keyPattern)[0]; // Obtener el campo duplicado
-			let errorMessage = '';
-			const errorStatus = 409;
-
-			if (duplicateField === 'username') {
-				errorMessage = 'Username already in use.';
-			} else if (duplicateField === 'email') {
-				errorMessage = 'Email already in use.';
-			} else {
-				errorMessage = 'Duplicate field error.';
-			}
-
-			res.status(errorStatus);
-
-			res.json({
-				succes: false,
-				error: errorMessage,
-			});
-		} else {
-			res.status(error.status || 500);
-
-			res.json({
-				succes: false,
-				error: error.message,
-			});
-		}
-	}
+	return {
+		user,
+		accessToken,
+		refreshToken,
+	};
 }
 
-async function login(req, res) {
-	const { username, password } = req.body;
-
+async function login(username, password) {
 	if (!username || !password) {
 		throw createError(400, 'Username/Email and password are required');
 	}
@@ -77,35 +44,25 @@ async function login(req, res) {
 		? { email: username.toLowerCase() }
 		: { username: username.toLowerCase() };
 
-	try {
-		const user = await User.findOne(loginField);
+	const user = await User.findOne(loginField);
 
-		if (!user) {
-			throw createError(400, 'Invalid credentials');
-		}
-
-		const isValidPassword = await verifyPassword(password, user.password);
-
-		if (!isValidPassword) {
-			throw createError(400, 'Invalid credentials');
-		}
-
-		const accessToken = jwt.generateToken(user);
-		const refreshToken = jwt.generateRefreshToken(user);
-
-		res.status(200).json({
-			message: 'Login successful',
-			accessToken,
-			refreshToken,
-		});
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
+	if (!user) {
+		throw createError(400, 'Invalid credentials');
 	}
+
+	const isValidPassword = await verifyPassword(password, user.password);
+
+	if (!isValidPassword) {
+		throw createError(400, 'Invalid credentials');
+	}
+
+	const accessToken = jwt.generateToken(user);
+	const refreshToken = jwt.generateRefreshToken(user);
+
+	return {
+		accessToken,
+		refreshToken,
+	};
 }
 
 module.exports = {
