@@ -1,8 +1,31 @@
 const express = require('express');
-const UserController = require('../usecases/user.usecase');
+const userUsecase = require('../usecases/user.usecase');
 
 const api = express.Router();
 
-api.get('/user/:id', UserController.getUserById);
+api.get('/user/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		if (!id) {
+			throw createError(400, 'User ID is required');
+		}
+
+		const user = await userUsecase.getUserById(id);
+
+		res.status(200).json({
+			success: true,
+			message: 'User retrieved successfully',
+			data: user,
+		});
+	} catch (error) {
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
+	}
+});
 
 module.exports = api;
