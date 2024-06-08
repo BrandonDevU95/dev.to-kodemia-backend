@@ -1,6 +1,6 @@
 const express = require('express');
 const PostController = require('../usecases/post');
-const { userAuth } = require('../middlewares/authenticated');
+const { userAuth } = require('../middlewares/auth.middleware');
 
 const api = express.Router();
 
