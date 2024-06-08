@@ -1,4 +1,4 @@
-const Bookmark = require('../models/bookmark');
+const Bookmark = require('../models/bookmark.model');
 const { validateBookmark } = require('../schemas/bookmark');
 const createError = require('http-errors');
 
