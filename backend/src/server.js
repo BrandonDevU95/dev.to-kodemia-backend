@@ -4,7 +4,7 @@ const cors = require('cors');
 //Import Routes
 const authRoutes = require('./router/auth.router');
 const userRoutes = require('./router/user');
-const postRoutes = require('./router/post');
+const postRoutes = require('./router/post.router');
 const bookmarkRoutes = require('./router/bookmark.router');
 
 const app = express();
