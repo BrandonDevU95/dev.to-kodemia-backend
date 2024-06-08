@@ -1,5 +1,5 @@
 const Post = require('../models/post.model');
-const { validatePost, validatePostPartial } = require('../schemas/post');
+const { validatePost, validatePostPartial } = require('../schemas/post.schema');
 const createError = require('http-errors');
 
 const createPost = async (req, res) => {
