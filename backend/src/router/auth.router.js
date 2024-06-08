@@ -1,11 +1,18 @@
 const express = require('express');
 const authUsecase = require('../usecases/auth.usecase');
+const createError = require('http-errors');
 
 const api = express.Router();
 
 api.post('/signup', async (req, res) => {
 	try {
-		const user = await authUsecase.signup(req.body);
+		const userData = req.body;
+
+		if (!userData) {
+			throw createError(400, 'User data is required.');
+		}
+
+		const user = await authUsecase.signup(userData);
 		res.status(201).json({
 			success: true,
 			message: 'User created successfully',
