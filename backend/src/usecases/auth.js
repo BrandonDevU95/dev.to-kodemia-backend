@@ -1,6 +1,6 @@
 const User = require('../models/user.model');
 const { encryptPassword, verifyPassword } = require('../lib/encrypt');
-const { validateUser } = require('../schemas/user');
+const { validateUser } = require('../schemas/user.schema');
 const jwt = require('../lib/jwt');
 const createError = require('http-errors');
 
