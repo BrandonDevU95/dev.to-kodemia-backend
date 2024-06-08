@@ -2,82 +2,47 @@ const Post = require('../models/post.model');
 const { validatePost, validatePostPartial } = require('../schemas/post.schema');
 const createError = require('http-errors');
 
-const createPost = async (req, res) => {
-	const { user_id } = req.user;
-	const postFields = validatePost(req.body);
+const createPost = async (user_id, postData) => {
+	const postValidate = validatePost(postData);
 
-	if (!postFields.success) {
-		throw createError(400, JSON.parse(postFields.error.message));
+	if (!postValidate.success) {
+		throw createError(400, JSON.parse(postValidate.error.message));
 	}
 
-	const tempPost = {
-		...postFields.data,
+	const post = new Post({
+		...postValidate.data,
 		author: user_id,
-	};
+	});
 
-	const post = new Post(tempPost);
-
-	try {
-		await post.save();
-		res.status(201).json({ message: 'Post created successfully!' });
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
+	if (!post) {
+		throw createError(500, 'Error creating post');
 	}
+
+	const savedPost = await post.save();
+	return savedPost;
 };
 
-const getAllPosts = async (req, res) => {
-	try {
-		const posts = await Post.find().sort({ created_at: -1 });
+const getAllPosts = async () => {
+	const posts = await Post.find().sort({ created_at: -1 });
 
-		if (!posts) {
-			throw createError(404, 'No posts found');
-		}
-
-		res.status(200).json(posts);
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
+	if (!posts) {
+		throw createError(404, 'No posts found');
 	}
+
+	res.status(200).json(posts);
 };
 
-const getPostById = async (req, res) => {
-	const { id } = req.params;
+const getPostById = async (id) => {
+	const post = await Post.findById(id);
 
-	try {
-		const post = await Post.findById(id);
-
-		if (!post) {
-			throw createError(404, 'Post not found');
-		}
-
-		res.status(200).json(post);
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
+	if (!post) {
+		throw createError(404, 'Post not found');
 	}
+
+	res.status(200).json(post);
 };
 
-const updatePost = async (req, res) => {
-	const { id } = req.params;
-	const postFields = req.body;
-
-	if (!id) {
-		throw createError(400, 'Post ID is required');
-	}
-
+const updatePost = async (id, postData) => {
 	postFields.updated_at = new Date(postFields.updated_at);
 	delete postFields.author;
 
@@ -87,49 +52,25 @@ const updatePost = async (req, res) => {
 		throw createError(400, JSON.parse(postData.error.message));
 	}
 
-	try {
-		const post = await Post.findByIdAndUpdate({ _id: id }, postData.data, {
-			new: true,
-		});
+	const post = await Post.findByIdAndUpdate({ _id: id }, postData.data, {
+		new: true,
+	});
 
-		if (!post) {
-			throw createError(404, 'Post not found');
-		}
-
-		res.status(200).json({ message: 'Post updated successfully!' });
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
+	if (!post) {
+		throw createError(404, 'Post not found');
 	}
+
+	return post;
 };
 
-const deletePost = async (req, res) => {
-	const { id } = req.params;
+const deletePost = async (id) => {
+	const post = await Post.findByIdAndDelete({ _id: id });
 
-	if (!id) {
-		throw createError(400, 'Post ID is required');
+	if (!post) {
+		throw createError(404, 'Post not found');
 	}
 
-	try {
-		const post = await Post.findByIdAndDelete({ _id: id });
-
-		if (!post) {
-			throw createError(404, 'Post not found');
-		}
-
-		res.status(200).json({ message: 'Post deleted successfully!' });
-	} catch (error) {
-		res.status(error.status || 500);
-
-		res.json({
-			succes: false,
-			error: error.message,
-		});
-	}
+	return post;
 };
 
 module.exports = {
