@@ -1,4 +1,4 @@
-const Post = require('../models/post');
+const Post = require('../models/post.model');
 const { validatePost, validatePostPartial } = require('../schemas/post');
 const createError = require('http-errors');
 
