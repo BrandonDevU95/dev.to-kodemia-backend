@@ -2,7 +2,7 @@ const Post = require('../models/post.model');
 const { validatePost, validatePostPartial } = require('../schemas/post.schema');
 const createError = require('http-errors');
 
-const createPost = async (user_id, postData) => {
+async function createPost(user_id, postData) {
 	const postValidate = validatePost(postData);
 
 	if (!postValidate.success) {
@@ -20,9 +20,9 @@ const createPost = async (user_id, postData) => {
 
 	const savedPost = await post.save();
 	return savedPost;
-};
+}
 
-const getAllPosts = async () => {
+async function getAllPosts() {
 	const posts = await Post.find().sort({ created_at: -1 });
 
 	if (!posts) {
@@ -30,9 +30,9 @@ const getAllPosts = async () => {
 	}
 
 	return posts;
-};
+}
 
-const getPostById = async (id) => {
+async function getPostById(id) {
 	const post = await Post.findById(id);
 
 	if (!post) {
@@ -40,9 +40,9 @@ const getPostById = async (id) => {
 	}
 
 	return post;
-};
+}
 
-const updatePost = async (id, postData) => {
+async function updatePost(id, postData) {
 	postData.updated_at = new Date(postData.updated_at);
 	delete postData.author;
 
@@ -61,9 +61,9 @@ const updatePost = async (id, postData) => {
 	}
 
 	return post;
-};
+}
 
-const deletePost = async (id) => {
+async function deletePost(id) {
 	const post = await Post.findByIdAndDelete({ _id: id });
 
 	if (!post) {
@@ -71,7 +71,7 @@ const deletePost = async (id) => {
 	}
 
 	return post;
-};
+}
 
 module.exports = {
 	createPost,
