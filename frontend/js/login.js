@@ -1,9 +1,9 @@
 import {
-	login,
 	decodeToken,
+	getToken,
+	login,
 	setToken,
 	setUserData,
-	getToken,
 } from '../js/api/usersAPI.js';
 
 if (getToken()) {
@@ -32,9 +32,9 @@ loginBtn.addEventListener('click', async (event) => {
 		}
 	});
 
-	const { token } = await login(userObject);
-	setToken(token);
-	const user = decodeToken(token);
+	const { accessToken, refreshToken } = await login(userObject);
+	setToken(accessToken, refreshToken);
+	const user = decodeToken(accessToken);
 	setUserData(user);
 	form[0].classList.remove('was-validated');
 	form[0].reset();

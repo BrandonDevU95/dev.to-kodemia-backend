@@ -86,8 +86,9 @@ const login = async (userObject) => {
 			password: userObject.password,
 		}),
 	});
-	let data = await response.json();
-	return data;
+	let { accessToken, refreshToken } = await response.json();
+
+	return { accessToken, refreshToken };
 };
 
 const logout = () => {
