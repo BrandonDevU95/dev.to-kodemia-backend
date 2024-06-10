@@ -1,5 +1,3 @@
-import { posts, users } from '../seedDB.js';
-
 const POSTS_BASE_URL =
 	'https://kodemia-devto-default-rtdb.firebaseio.com/posts';
 
@@ -223,8 +221,6 @@ export {
 	updatePost,
 	getPostById,
 	getLastPosts,
-	verifyPostsDB,
-	createPostsDB,
 	verifyPostUser,
 	getAllPostByTag,
 	getAllCategories,

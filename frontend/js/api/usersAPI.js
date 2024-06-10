@@ -104,6 +104,7 @@ const setToken = (access_token, refresh_token) => {
 const getToken = () => {
 	const access_token = localStorage.getItem(ACCESS_TOKEN);
 	const refresh_token = localStorage.getItem(REFRESH_TOKEN);
+	if (!access_token || !refresh_token) return null;
 	return { access_token, refresh_token };
 };
 
