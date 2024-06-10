@@ -1,4 +1,3 @@
-import { access } from 'fs';
 import { users } from '../seedDB.js';
 
 const USERS_BASE_URL =
