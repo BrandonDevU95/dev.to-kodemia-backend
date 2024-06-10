@@ -31,11 +31,10 @@ const createUser = async (userObject) => {
 };
 
 const getUserByUsername = async (username) => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
-	let data = await response.json();
-	let keys = Object.keys(data);
-	let user = keys.find((key) => data[key].username === username);
-	return data[user];
+	console.log(username);
+	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
+	let { data } = await response.json();
+	return data;
 };
 
 const getAvatarByUsername = async (username) => {
