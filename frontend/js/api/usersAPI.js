@@ -1,9 +1,12 @@
+import { access } from 'fs';
 import { users } from '../seedDB.js';
 
 const USERS_BASE_URL =
 	'https://kodemia-devto-default-rtdb.firebaseio.com/users';
 const AUTH_BASE_URL = 'https://fakestoreapi.com/auth/login';
-const TOKEN = 'token';
+const URL_SERVER = 'http://localhost:3000/api';
+const ACCESS_TOKEN = 'access_token';
+const REFRESH_TOKEN = 'refresh_token';
 const USER = 'user';
 
 const createUsersDB = () => {
@@ -74,7 +77,7 @@ const getAllAvatarUsers = async () => {
 };
 
 const login = async (userObject) => {
-	let response = await fetch(AUTH_BASE_URL, {
+	let response = await fetch(`${URL_SERVER}/login`, {
 		headers: {
 			'Content-Type': 'application/json',
 		},
@@ -89,16 +92,20 @@ const login = async (userObject) => {
 };
 
 const logout = () => {
-	localStorage.removeItem(TOKEN);
+	localStorage.removeItem(ACCESS_TOKEN);
+	localStorage.removeItem(REFRESH_TOKEN);
 	localStorage.removeItem(USER);
 };
 
-const setToken = (token) => {
-	localStorage.setItem(TOKEN, token);
+const setToken = (access_token, refresh_token) => {
+	localStorage.setItem(ACCESS_TOKEN, access_token);
+	localStorage.setItem(REFRESH_TOKEN, refresh_token);
 };
 
 const getToken = () => {
-	return localStorage.getItem(TOKEN);
+	const access_token = localStorage.getItem(ACCESS_TOKEN);
+	const refresh_token = localStorage.getItem(REFRESH_TOKEN);
+	return { access_token, refresh_token };
 };
 
 const setUserData = (user) => {
