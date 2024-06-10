@@ -8,6 +8,7 @@ function generateToken(user) {
 	const payload = {
 		token_type: 'access',
 		user_id: user._id,
+		user: user.username,
 		iat: Date.now(),
 		exp: expToken.getTime(),
 	};
