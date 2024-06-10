@@ -1,5 +1,3 @@
-import { createPostsDB, getAllPost, verifyPostsDB } from './api/postsAPI.js';
-import { createUsersDB, verifyUsersDB } from './api/usersAPI.js';
 import {
 	printCategories,
 	printLastPosts,
@@ -8,6 +6,7 @@ import {
 	printTrendingPosts,
 } from '../js/components/posts.js';
 
+import { getAllPost } from './api/postsAPI.js';
 import { getToken } from './api/usersAPI.js';
 
 if (getToken()) {
@@ -40,11 +39,6 @@ search.addEventListener('keyup', async (e) => {
 		await printPost(result, 'posts-lists');
 	}, 500);
 });
-//crea una funcion anonima autoejecutable para cargar la DB
 (async () => {
-	const posts = await verifyPostsDB();
-	const users = await verifyUsersDB();
-	if (!posts) createPostsDB();
-	if (!users) createUsersDB();
 	loadPage();
 })();

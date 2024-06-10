@@ -1,18 +1,10 @@
 import {
-	createPostsDB,
 	getAllPost,
 	getLastPosts,
 	getPostsByRelevant,
 	getPostsMoreReactions,
-	verifyPostsDB,
 } from '../js/api/postsAPI.js';
-import {
-	createUsersDB,
-	getToken,
-	getUserData,
-	logout,
-	verifyUsersDB,
-} from '../js/api/usersAPI.js';
+import { getToken, getUserData, logout } from '../js/api/usersAPI.js';
 import {
 	loadAvatar,
 	loadInfoUser,
@@ -129,10 +121,6 @@ btnLogout.addEventListener('click', () => {
 
 //crea una funcion anonima autoejecutable para cargar la DB
 (async () => {
-	const posts = await verifyPostsDB();
-	const users = await verifyUsersDB();
-	if (!posts) createPostsDB();
-	if (!users) createUsersDB();
 	loadPage();
 	loadAvatar(user, 'avatar-image');
 	loadInfoUser(user);
