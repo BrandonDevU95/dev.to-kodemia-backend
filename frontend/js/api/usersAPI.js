@@ -1,77 +1,66 @@
-import { users } from '../seedDB.js';
-
-const USERS_BASE_URL =
-	'https://kodemia-devto-default-rtdb.firebaseio.com/users';
-const AUTH_BASE_URL = 'https://fakestoreapi.com/auth/login';
 const URL_SERVER = 'http://localhost:3000/api';
-const ACCESS_TOKEN = 'access_token';
-const REFRESH_TOKEN = 'refresh_token';
+const ACCESS_TOKEN = 'accessToken';
+const REFRESH_TOKEN = 'refreshToken';
 const USER = 'user';
 
-const createUsersDB = () => {
-	users.forEach(async (user) => {
-		await createUser(user);
-	});
-	console.log('Users DB Success');
-};
-
-const verifyUsersDB = async () => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
-	let data = await response.json();
-	return data;
-};
-
 const createUser = async (userObject) => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`, {
+	let response = await fetch(`${URL_SERVER}/signup`, {
 		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
 		body: JSON.stringify(userObject),
 	});
 	let data = await response.json();
+	if (!response.ok) {
+		console.log(data);
+	}
 	return data;
 };
 
 const getUserByUsername = async (username) => {
-	console.log(username);
 	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
 	let { data } = await response.json();
+	if (!response.ok) {
+		console.log(data);
+	}
 	return data;
 };
 
 const getAvatarByUsername = async (username) => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
 	let data = await response.json();
-	let keys = Object.keys(data);
-	let user = keys.find((key) => data[key].username === username);
-	return data[user].avatar;
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data.user.avatar;
 };
 
 const getAboutUserByUsername = async (username) => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
 	let data = await response.json();
-	let keys = Object.keys(data);
-	let user = keys.find((key) => data[key].username === username);
-	return data[user].acerca;
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data.user.about;
 };
 
 const getNameByUsername = async (username) => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
 	let data = await response.json();
-	let keys = Object.keys(data);
-	let user = keys.find((key) => data[key].username === username);
-	return data[user].name;
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data.user.name;
 };
 
 const getAllAvatarUsers = async () => {
-	let response = await fetch(`${USERS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/user/avatars`);
 	let data = await response.json();
-	let keys = Object.keys(data);
-	let avatars = keys.map((key) => {
-		return {
-			username: data[key].username,
-			imagen: data[key].avatar,
-		};
-	});
-	return avatars;
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data;
 };
 
 const login = async (userObject) => {
@@ -96,16 +85,16 @@ const logout = () => {
 	localStorage.removeItem(USER);
 };
 
-const setToken = (access_token, refresh_token) => {
-	localStorage.setItem(ACCESS_TOKEN, access_token);
-	localStorage.setItem(REFRESH_TOKEN, refresh_token);
+const setToken = (accessToken, refreshToken) => {
+	localStorage.setItem(ACCESS_TOKEN, accessToken);
+	localStorage.setItem(REFRESH_TOKEN, refreshToken);
 };
 
 const getToken = () => {
-	const access_token = localStorage.getItem(ACCESS_TOKEN);
-	const refresh_token = localStorage.getItem(REFRESH_TOKEN);
-	if (!access_token || !refresh_token) return null;
-	return { access_token, refresh_token };
+	const accessToken = localStorage.getItem(ACCESS_TOKEN);
+	const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+	if (!accessToken || !refreshToken) return null;
+	return { accessToken, refreshToken };
 };
 
 const setUserData = (user) => {
@@ -131,8 +120,6 @@ export {
 	setUserData,
 	getUserData,
 	decodeToken,
-	createUsersDB,
-	verifyUsersDB,
 	getUserByUsername,
 	getAllAvatarUsers,
 	getNameByUsername,
