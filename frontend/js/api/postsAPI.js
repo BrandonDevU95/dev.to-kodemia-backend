@@ -1,9 +1,18 @@
-const POSTS_BASE_URL =
-	'https://kodemia-devto-default-rtdb.firebaseio.com/posts';
+const URL_SERVER = 'http://localhost:3000/api';
+
+import { getToken } from './usersAPI.js';
 
 const createPost = async (postObject) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`, {
+	const { accessToken, refreshToken } = getToken();
+	if (!accessToken || !refreshToken) return null;
+
+	let response = await fetch(`${URL_SERVER}/posts`, {
 		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
 		body: JSON.stringify(postObject),
 	});
 	let data = await response.json();
@@ -11,8 +20,16 @@ const createPost = async (postObject) => {
 };
 
 const updatePost = async (postObject, postId) => {
-	let response = await fetch(`${POSTS_BASE_URL}/${postId}.json`, {
+	const { accessToken, refreshToken } = getToken();
+	if (!accessToken || !refreshToken) return null;
+
+	let response = await fetch(`${URL_SERVER}/posts/${postId}`, {
 		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
 		body: JSON.stringify(postObject),
 	});
 	let data = await response.json();
@@ -20,197 +37,102 @@ const updatePost = async (postObject, postId) => {
 };
 
 const deletePost = async (postId) => {
-	let response = await fetch(`${POSTS_BASE_URL}/${postId}.json`, {
+	const { accessToken, refreshToken } = getToken();
+	if (!accessToken || !refreshToken) return null;
+
+	let response = await fetch(`${URL_SERVER}/posts/${postId}`, {
 		method: 'DELETE',
+		headers: {
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
 	});
 	let data = await response.json();
 	return data;
 };
 
 const getPostById = async (postId) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/${postId}`);
+	if (!response.ok) return null;
+
 	let data = await response.json();
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	const post = postsArray.filter((post) => post.key === postId);
-	return post[0];
+	return data;
 };
 
 const getAllPost = async () => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	postsArray.sort((a, b) => {
-		return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
-	});
-
-	return postsArray;
+	return data;
 };
 
 const getAllTags = async () => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/tags`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	//Crea un array con todos los tags de los posts con una profundidad de 1
-	let tagsArray = postsArray.map((post) => post.tags).flat();
-	//Crea un objeto Set para almacenar valores únicos de tags
-	let tagsSet = new Set(tagsArray);
-	//Convierte el objeto Set a un array
-	let tagsUnique = [...tagsSet];
-	return tagsUnique;
+	return data;
 };
 
 const getLastPosts = async (numPost) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/last-posts/${numPost}`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	//Ordenar los posts por fecha
-	postsArray.sort((a, b) => {
-		return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
-	});
-
-	//Obtener los ultimos 10 posts
-	let lastPosts = postsArray.slice(0, numPost);
-	return lastPosts;
+	return data;
 };
 
 const getAllCategories = async () => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/categories`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	let categoriesArray = postsArray.map((post) => post.categoria);
-	//Crea un objeto Set para almacenar valores únicos de categorias
-	let categoriesSet = new Set(categoriesArray);
-	//Convierte el objeto Set a un array
-	let categoriesUnique = [...categoriesSet];
-	return categoriesUnique;
+	return data;
 };
 
 const getPostsMoreReactions = async (numPost) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/top-reactions/${numPost}`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	//Ordenar los posts por numero de reacciones
-	postsArray.sort((a, b) => {
-		return b.numReacciones - a.numReacciones;
-	});
-
-	//Obtener los ultimos 10 posts
-	return postsArray.slice(0, numPost);
+	return data;
 };
 
-const getPostsByRelevant = async (post = null) => {
-	let relevantPosts;
-	if (!post) {
-		let response = await fetch(`${POSTS_BASE_URL}/.json`);
-		let data = await response.json();
-		let keys = Object.keys(data);
-
-		let postsArray = keys.map((key) => ({ ...data[key], key }));
-		// Regresa solo los post que tengas true en la propiedad relevante
-		relevantPosts = postsArray.filter((post) => post.relevante);
-		// regresa solo 3 post relevantes
-		return relevantPosts.slice(0, 3);
-	} else {
-		relevantPosts = post.filter((post) => post.relevante);
-		return relevantPosts;
-	}
+const getPostsByRelevant = async () => {
+	let response = await fetch(`${URL_SERVER}/posts/relevant`);
+	if (!response.ok) return null;
+	let data = await response.json();
+	return data;
 };
 
 const getPostByCategory = async (categoria) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/category/${categoria}`);
+	if (!response.ok) return null;
 	let data = await response.json();
-	let keys = Object.keys(data);
-
-	// Regresa solo los post que tengan la categoria que se le pase
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-	let categoryPosts = postsArray.filter(
-		(post) => post.categoria === categoria
-	);
-
-	// regresa solo 1 post random
-	return categoryPosts[Math.floor(Math.random() * categoryPosts.length)];
+	return data;
 };
 
-const getPostsByUsername = async (username) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+const getPostsByUsername = async (userId) => {
+	let response = await fetch(`${URL_SERVER}/posts/author/${userId}`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	//Ordenar los posts por fecha
-	postsArray.sort((a, b) => {
-		return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
-	});
-
-	// Regresa solo los post que tengan el username que se le pase
-	let userPosts = postsArray.filter(
-		(post) => post.autor.username === username
-	);
-
-	if (userPosts.length === 0) return null;
-
-	return userPosts;
+	return data;
 };
 
 const getAllPostByTag = async (tag) => {
-	let response = await fetch(`${POSTS_BASE_URL}/.json`);
+	let response = await fetch(`${URL_SERVER}/posts/tag/${tag}`);
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let postsArray = keys.map((key) => ({ ...data[key], key }));
-
-	// Regresa solo los post que tengan el tag que se le pase
-	let tagPosts = postsArray.filter((post) => post.tags.includes(tag));
-
-	if (tagPosts.length === 0) return null;
-
-	return tagPosts;
+	return data;
 };
 
-const verifyPostUser = async (username, postId) => {
-	let response = await fetch(`${POSTS_BASE_URL}/${postId}.json`);
+const verifyPostUser = async (postId) => {
+	const { accessToken, refreshToken } = getToken();
+	let response = await fetch(`${URL_SERVER}/posts/verify-post/${postId}`, {
+		headers: {
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
+	});
+	if (!response.ok) return null;
 	let data = await response.json();
-
-	if (!data) return null;
-
-	if (data.autor.username === username) {
-		return true;
-	}
-
-	return false;
+	return data;
 };
 
 export {
