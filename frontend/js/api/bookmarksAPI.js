@@ -1,63 +1,62 @@
-const BOOKMAK_BASE_URL =
-	'https://kodemia-devto-default-rtdb.firebaseio.com/bookmarks';
+const URL_SERVER = 'http://localhost:3000/api';
 
-const saveBookmarkUser = async (username, postId) => {
-	let response = await fetch(`${BOOKMAK_BASE_URL}/.json`, {
+import { getToken } from './usersAPI.js';
+
+const saveBookmarkUser = async (postId) => {
+	const { accessToken, refreshToken } = getToken();
+	let response = await fetch(`${URL_SERVER}/bookmarks`, {
 		method: 'POST',
-		body: JSON.stringify({ username, postId }),
+		headers: {
+			'Content-Type': 'application',
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
+		body: JSON.stringify({ postId }),
 	});
 	let data = await response.json();
+	if (!response.ok) {
+		console.log(data);
+	}
 	return data;
 };
 
-const deleteBookmark = async (user, postId) => {
-	//Eliminar el bookmark solo si el post corresponde al usuario
-	const bookmarkId = await getBookmarkIdByPost(user, postId);
-
-	if (!bookmarkId) return null;
-
-	let response = await fetch(`${BOOKMAK_BASE_URL}/${bookmarkId}.json`, {
+const deleteBookmark = async (postId) => {
+	const { accessToken, refreshToken } = getToken();
+	let response = await fetch(`${URL_SERVER}/bookmarks/${postId}`, {
 		method: 'DELETE',
+		headers: {
+			'Content-Type': 'application',
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
 	});
 	let data = await response.json();
 	return data;
 };
 
-const getBookmarkIdByPost = async (user, postId) => {
-	let response = await fetch(`${BOOKMAK_BASE_URL}/.json`);
+const getBookmarkIdByPost = async (postId) => {
+	let response = await fetch(`${URL_SERVER}/bookmarks/${postId}`);
 	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let bookmarksArray = keys.map((key) => ({ ...data[key], key }));
-
-	const bookmark = bookmarksArray.find(
-		(bookmark) => bookmark.username === user && bookmark.postId === postId
-	);
-
-	return bookmark.key;
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data;
 };
 
-const getAllBookmarksByUser = async (username) => {
-	let response = await fetch(`${BOOKMAK_BASE_URL}/.json`);
-	let data = await response.json();
-
-	if (!data) return null;
-
-	let keys = Object.keys(data);
-	let bookmarksArray = keys.map((key) => ({ ...data[key], key }));
-
-	//Ordenar los posts por fecha
-	bookmarksArray.sort((a, b) => {
-		return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
+const getAllBookmarksByUser = async () => {
+	const { accessToken, refreshToken } = getToken();
+	let response = await fetch(`${URL_SERVER}/bookmarks`, {
+		headers: {
+			'Content-Type': 'application',
+			Authorization: accessToken,
+			'Refresh-Token': refreshToken,
+		},
 	});
-
-	const bookmarks = bookmarksArray.filter(
-		(bookmark) => bookmark.username === username
-	);
-
-	return bookmarks;
+	let data = await response.json();
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data;
 };
 
 export {
