@@ -7,8 +7,8 @@ import {
 	getPostById,
 	getPostsMoreReactions,
 } from '../api/postsAPI.js';
+import { getAvatarByUsername, getUserInfo } from '../api/usersAPI.js';
 
-import { getAvatarByUsername } from '../api/usersAPI.js';
 import { getToken } from '../api/usersAPI.js';
 
 const token = getToken();
@@ -62,18 +62,18 @@ const createTabDiscuss = (post) => {
 	tabElement.classList.add('p-3', 'border-bottom', 'border-light');
 	const tabLink = document.createElement('a');
 	const url = token ? 'details' : 'guestDetails';
-	tabLink.href = `../../views/${url}.html?id=${post.key}`;
+	tabLink.href = `../../views/${url}.html?id=${post._id}`;
 	tabLink.classList.add('text-decoration-none', 'text-discuss');
 	const tabTitle = document.createElement('p');
 	tabTitle.classList.add('m-0');
-	//Limitar el titulo a 40 caracteres
+	//Limitar el title a 40 caracteres
 	tabTitle.textContent =
-		post.titulo.length > 30
-			? post.titulo.substring(0, 40) + '...'
-			: post.titulo;
+		post.title.length > 30
+			? post.title.substring(0, 40) + '...'
+			: post.title;
 	const tabComments = document.createElement('span');
 	tabComments.classList.add('pt-1', 'fs-6', 'text-secondary');
-	tabComments.textContent = `${post.numComentarios} comments`;
+	tabComments.textContent = `${post.numComments} comments`;
 	tabLink.appendChild(tabTitle);
 	tabLink.appendChild(tabComments);
 	tabElement.appendChild(tabLink);
@@ -149,7 +149,7 @@ const printCategories = async (wrapperId) => {
 
 	categoriesArray.forEach(async (category) => {
 		const post = await getPostByCategory(category);
-		const tabElement = createTab(category, post.key);
+		const tabElement = createTab(category, post._id);
 		wrapper.appendChild(tabElement);
 	});
 };
@@ -159,7 +159,7 @@ const printTrendingPosts = async (numPost, wrapperId) => {
 	const trendingPosts = await getPostsMoreReactions(numPost);
 
 	trendingPosts.forEach((trend) => {
-		const tabElement = createTab(trend.titulo, trend.key);
+		const tabElement = createTab(trend.title, trend.key);
 		wrapper.appendChild(tabElement);
 	});
 };
@@ -202,7 +202,7 @@ const createPostCard = async (post, index, notImg) => {
 	div3.id = 'image-first-post';
 
 	if (index === 0 && !notImg) {
-		createImageTop(div3, post.imagen, post.titulo);
+		createImageTop(div3, post.image, post.title);
 	}
 
 	div2.appendChild(div3);
@@ -225,9 +225,9 @@ const createPostCard = async (post, index, notImg) => {
 	div7.classList.add('me-2');
 
 	const img = document.createElement('img');
-	const avatar = await getAvatarByUsername(post.autor.username);
+	const avatar = await getAvatarByUsername(post.author);
 	img.src = avatar;
-	img.alt = post.autor.name;
+	img.alt = post.author.name;
 	img.classList.add('rounded-circle');
 	img.width = '32';
 	img.height = '32';
@@ -237,12 +237,12 @@ const createPostCard = async (post, index, notImg) => {
 
 	const p = document.createElement('p');
 	p.classList.add('m-0', 'pb-1', 'fw-medium', 'text-capitalize');
-	p.textContent = post.autor.name;
+	p.textContent = post.author.name;
 	div8.appendChild(p);
 
 	const span = document.createElement('span');
 	span.classList.add('fw-light');
-	span.textContent = post.fechaCreacion;
+	span.textContent = post.created_at;
 	div8.appendChild(span);
 
 	div6.appendChild(div7);
@@ -257,12 +257,12 @@ const createPostCard = async (post, index, notImg) => {
 
 	const a3 = document.createElement('a');
 	const url = token ? 'details' : 'guestDetails';
-	a3.href = `../../views/${url}.html?id=${post.key}`;
+	a3.href = `../../views/${url}.html?id=${post._id}`;
 	a3.classList.add('text-decoration-none');
 
 	const h2 = document.createElement('h2');
 	h2.classList.add('mb-1', 'fs-4', 'fw-bold', 'px-2', 'text-discuss');
-	h2.textContent = post.titulo;
+	h2.textContent = post.title;
 
 	a3.appendChild(h2);
 	div10.appendChild(a3);
@@ -392,7 +392,7 @@ const createPostCard = async (post, index, notImg) => {
 
 	const span9 = document.createElement('span');
 	span9.classList.add('hidden', 's:inline');
-	span9.textContent = `${post.numReacciones} reactions`;
+	span9.textContent = `${post.numReactions} reactions`;
 
 	span8.appendChild(span9);
 	div14.appendChild(span2);
@@ -427,7 +427,7 @@ const createPostCard = async (post, index, notImg) => {
 	const div15 = document.createElement('div');
 	div15.classList.add('d-flex', 'align-items-center', 'fw-light');
 
-	const time = post.tiempoLectura.split(' ');
+	const time = post.readingTime.split(' ');
 	const p2 = document.createElement('p');
 	p2.classList.add('mb-0', 'me-2');
 	p2.textContent = time[0];
@@ -443,7 +443,7 @@ const createPostCard = async (post, index, notImg) => {
 	btnIcon.disabled = true;
 
 	const i = document.createElement('i');
-	i.id = post.key;
+	i.id = post._id;
 	i.classList.add(
 		'bi',
 		'bi-bookmark',
@@ -481,7 +481,7 @@ const printPost = async (posts, wrapperId, notImg = false) => {
 	});
 };
 
-const createPostDetail = (post) => {
+const createPostDetail = async (post) => {
 	const card = document.createElement('div');
 	card.classList.add('card', 'border-light-subtle');
 
@@ -491,8 +491,8 @@ const createPostDetail = (post) => {
 
 	const image = document.createElement('img');
 	image.classList.add('card-img-top', 'object-fit-cover');
-	image.src = post.imagen;
-	image.alt = post.titulo;
+	image.src = post.image;
+	image.alt = post.title;
 	image.height = '340';
 	imageFirstPost.appendChild(image);
 
@@ -515,11 +515,11 @@ const createPostDetail = (post) => {
 
 	const authorImage = document.createElement('div');
 	const avatar = document.createElement('img');
-	avatar.src = post.autor.avatar;
+	avatar.src = post.avatar;
 	avatar.classList.add('rounded-circle');
 	avatar.width = '46';
 	avatar.height = '46';
-	avatar.alt = post.autor.name;
+	avatar.alt = post.author.name;
 	authorImage.appendChild(avatar);
 	lh1.appendChild(authorImage);
 
@@ -528,14 +528,15 @@ const createPostDetail = (post) => {
 	lh1.appendChild(authorInfo);
 
 	const authorName = document.createElement('p');
+	const author = await getUserInfo(post.author);
 	authorName.classList.add('mb-1', 'fw-bold', 'text-capitalize', 'fs-5_5');
-	authorName.textContent = post.autor.name;
+	authorName.textContent = `${author.name.firstname}  ${author.name.lastname}`;
 	authorInfo.appendChild(authorName);
 
 	const fechaCreacion = document.createElement('span');
 	fechaCreacion.classList.add('fw-light', 'text-secondary', 'fs-xs');
 	fechaCreacion.textContent = `Posted on ${new Date(
-		post.fechaCreacion
+		post.created_at
 	).toLocaleDateString('en-US', {
 		month: 'short',
 		day: 'numeric',
@@ -600,7 +601,7 @@ const createPostDetail = (post) => {
 
 	const postTitle = document.createElement('h1');
 	postTitle.classList.add('fw-bold');
-	postTitle.textContent = post.titulo;
+	postTitle.textContent = post.title;
 
 	postInfo.appendChild(postCategory);
 	postInfo.appendChild(postTitle);
@@ -630,7 +631,7 @@ const createPostDetail = (post) => {
 
 	const postDescription = document.createElement('p');
 	postDescription.classList.add('fs-5');
-	postDescription.textContent = post.descripcion;
+	postDescription.textContent = post.description;
 	cardBody.appendChild(postDescription);
 
 	return card;
@@ -644,12 +645,12 @@ const setFavDetails = (fav, wrapperId) => {
 const printDetailsPost = async (id, wrapperId) => {
 	const wrapper = document.getElementById(wrapperId);
 	const post = await getPostById(id);
-	const avatar = await getAvatarByUsername(post.autor.username);
+	const { avatar } = await getUserInfo(post.author);
 
-	post.autor.avatar = avatar;
-	const postDetail = createPostDetail(post);
-	setFavDetails(post.numReacciones, 'fav-details');
-	setFavDetails(post.numComentarios, 'comments-details');
+	post.avatar = avatar;
+	const postDetail = await createPostDetail(post);
+	setFavDetails(post.numReactions, 'fav-details');
+	setFavDetails(post.numComments, 'comments-details');
 	setFavDetails(Math.floor(Math.random() * 10) + 1, 'saved-details');
 	wrapper.appendChild(postDetail);
 };
