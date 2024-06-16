@@ -27,13 +27,22 @@ const getUserByUsername = async (username) => {
 	return data;
 };
 
-const getAvatarByUsername = async (username) => {
-	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
-	let data = await response.json();
+const getUserInfo = async (user_id) => {
+	let response = await fetch(`${URL_SERVER}/user/${user_id}`);
+	let { data } = await response.json();
 	if (!response.ok) {
 		console.log(data);
 	}
-	return data.user.avatar;
+	return data;
+};
+
+const getAvatarByUsername = async (user_id) => {
+	let response = await fetch(`${URL_SERVER}/user/${user_id}`);
+	let { data } = await response.json();
+	if (!response.ok) {
+		console.log(data);
+	}
+	return data.avatar;
 };
 
 const getAboutUserByUsername = async (username) => {
@@ -117,6 +126,7 @@ export {
 	getToken,
 	setToken,
 	createUser,
+	getUserInfo,
 	setUserData,
 	getUserData,
 	decodeToken,
