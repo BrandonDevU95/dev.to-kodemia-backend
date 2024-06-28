@@ -15,6 +15,10 @@ app.use(express.json());
 //Configure CORS
 app.use(cors());
 
+app.get('/', (req, res) => {
+	res.send('Hello Koders');
+});
+
 //Configure Routes
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
