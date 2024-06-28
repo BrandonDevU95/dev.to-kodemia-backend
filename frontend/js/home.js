@@ -25,7 +25,7 @@ if (!getToken()) {
 	window.location.href = '../index.html';
 }
 
-const { user } = getUserData();
+const { user, user_id } = getUserData();
 
 const search = document.getElementById('input-search');
 const relevant = document.getElementById('relevant');
@@ -122,7 +122,7 @@ btnLogout.addEventListener('click', () => {
 //crea una funcion anonima autoejecutable para cargar la DB
 (async () => {
 	loadPage();
-	loadAvatar(user, 'avatar-image');
-	loadInfoUser(user);
+	loadAvatar(user_id, 'avatar-image');
+	loadInfoUser(user_id);
 	notificatiosnRandom();
 })();

@@ -1,8 +1,8 @@
 import { deletePost, verifyPostUser } from '../js/api/postsAPI.js';
 import {
-	getAvatarByUsername,
 	getToken,
 	getUserData,
+	getUserInfo,
 	logout,
 } from '../js/api/usersAPI.js';
 import {
@@ -16,7 +16,7 @@ import { reloadBookmarks } from '../js/components/bookmark.js';
 
 const url = window.location.href;
 const btnLogout = document.getElementById('logout');
-const avatar = document.getElementById('avatar-image');
+const avatarImage = document.getElementById('avatar-image');
 const params = new URLSearchParams(new URL(url).search);
 
 const id = params.get('id');
@@ -25,7 +25,7 @@ if (!getToken()) {
 	window.location.href = `../index.html`;
 }
 
-const { user } = getUserData();
+const { user, user_id } = getUserData();
 
 btnLogout.addEventListener('click', () => {
 	logout();
@@ -33,9 +33,9 @@ btnLogout.addEventListener('click', () => {
 });
 
 //Crear dos botones editar y eliminar e incertar en el wrapperId
-const printControlsUser = async (username, postId, wrapperId) => {
+const printControlsUser = async (postId, wrapperId) => {
 	const wrapper = document.getElementById(wrapperId);
-	const isVerified = await verifyPostUser(username, postId);
+	const isVerified = await verifyPostUser(postId);
 
 	if (isVerified) {
 		const controls = document.createElement('div');
@@ -93,15 +93,15 @@ const setIdBookmark = (id) => {
 };
 
 (async () => {
-	const avatarImage = await getAvatarByUsername(user);
-	avatar.src = avatarImage;
-	avatar.alt = user;
+	const { avatar } = await getUserInfo(user_id);
+	avatarImage.src = avatar;
+	avatarImage.alt = user_id;
 	setIdBookmark(id);
-	loadInfoUser(user);
+	loadInfoUser(user_id);
 	reloadBookmarks(user, 500);
 })();
 
 printDetailsPost(id, 'post-details');
 printCardUser(id, 'user-details');
-printControlsUser(user, id, 'aside-left-details');
+printControlsUser(id, 'aside-left-details');
 notificatiosnRandom();

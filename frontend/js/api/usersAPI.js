@@ -18,15 +18,6 @@ const createUser = async (userObject) => {
 	return data;
 };
 
-const getUserByUsername = async (username) => {
-	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
-	let { data } = await response.json();
-	if (!response.ok) {
-		console.log(data);
-	}
-	return data;
-};
-
 const getUserInfo = async (user_id) => {
 	let response = await fetch(`${URL_SERVER}/user/${user_id}`);
 	let { data } = await response.json();
@@ -36,36 +27,9 @@ const getUserInfo = async (user_id) => {
 	return data;
 };
 
-const getAvatarByUsername = async (user_id) => {
-	let response = await fetch(`${URL_SERVER}/user/${user_id}`);
-	let { data } = await response.json();
-	if (!response.ok) {
-		console.log(data);
-	}
-	return data.avatar;
-};
-
-const getAboutUserByUsername = async (username) => {
-	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
-	let data = await response.json();
-	if (!response.ok) {
-		console.log(data);
-	}
-	return data.user.about;
-};
-
-const getNameByUsername = async (username) => {
-	let response = await fetch(`${URL_SERVER}/user/username/${username}`);
-	let data = await response.json();
-	if (!response.ok) {
-		console.log(data);
-	}
-	return data.user.name;
-};
-
 const getAllAvatarUsers = async () => {
 	let response = await fetch(`${URL_SERVER}/user/avatars`);
-	let data = await response.json();
+	let { data } = await response.json();
 	if (!response.ok) {
 		console.log(data);
 	}
@@ -130,9 +94,5 @@ export {
 	setUserData,
 	getUserData,
 	decodeToken,
-	getUserByUsername,
 	getAllAvatarUsers,
-	getNameByUsername,
-	getAvatarByUsername,
-	getAboutUserByUsername,
 };

@@ -1,13 +1,8 @@
-import {
-	getAboutUserByUsername,
-	getAllAvatarUsers,
-	getAvatarByUsername,
-	getUserByUsername,
-} from '../api/usersAPI.js';
+import { getAllAvatarUsers, getUserInfo } from '../api/usersAPI.js';
 
 import { getPostById } from '../api/postsAPI.js';
 
-const createUserCardInfo = (user) => {
+const createUserCardInfo = async (user) => {
 	const card = document.createElement('div');
 	card.classList.add('card');
 
@@ -27,18 +22,19 @@ const createUserCardInfo = (user) => {
 	userImg.classList.add('rounded-circle', 'margin-avatar');
 	userImg.width = 48;
 	userImg.height = 48;
-	userImg.alt = user.autor;
+	userImg.alt = user.author;
 	userDiv.appendChild(userImg);
 
 	const userName = document.createElement('span');
 	userName.classList.add(
 		'fw-bold',
-		'fs-4',
+		'fs-5',
 		'fw-bold',
 		'ps-2',
 		'text-capitalize'
 	);
-	userName.textContent = user.autor;
+	const { name, created_at } = await getUserInfo(user.author);
+	userName.textContent = `${name.firstname} ${name.lastname}`;
 	userDiv.appendChild(userName);
 
 	const followButtonDiv = document.createElement('div');
@@ -74,30 +70,29 @@ const createUserCardInfo = (user) => {
 	joinedDiv.appendChild(joinedLabel);
 
 	const joinedDate = document.createElement('span');
-	joinedDate.textContent = '1 may 2024';
+	joinedDate.textContent = Date(created_at).slice(0, 15);
 	joinedDiv.appendChild(joinedDate);
-
 	return card;
 };
 
 const printCardUser = async (id, wrapperId) => {
 	const post = await getPostById(id);
 	const wrapper = document.getElementById(wrapperId);
-	const avatar = await getAvatarByUsername(post.autor.username);
-	const about = await getAboutUserByUsername(post.autor.username);
+	const { avatar } = await getUserInfo(post.author);
+	const { about } = await getUserInfo(post.author);
 
 	const user = {
 		avatar,
-		autor: post.autor.name,
+		author: post.author,
 		about,
 	};
 
-	const card = createUserCardInfo(user);
+	const card = await createUserCardInfo(user);
 	wrapper.appendChild(card);
 };
 
-const loadInfoUser = async (user) => {
-	const userInfo = await getUserByUsername(user);
+const loadInfoUser = async (user_id) => {
+	const userInfo = await getUserInfo(user_id);
 	const name = document.getElementById('info-name-user');
 	const username = document.getElementById('info-username-user');
 
@@ -105,11 +100,11 @@ const loadInfoUser = async (user) => {
 	username.textContent = `@${userInfo.username}`;
 };
 
-const loadAvatar = async (user, wrapperId) => {
-	const avatar = document.getElementById(wrapperId);
-	const avatarImage = await getAvatarByUsername(user);
-	avatar.src = avatarImage;
-	avatar.alt = user;
+const loadAvatar = async (user_id, wrapperId) => {
+	const avatarImage = document.getElementById(wrapperId);
+	const { avatar } = await getUserInfo(user_id);
+	avatarImage.src = avatar;
+	avatarImage.alt = user_id;
 };
 
 const notificatiosnRandom = () => {

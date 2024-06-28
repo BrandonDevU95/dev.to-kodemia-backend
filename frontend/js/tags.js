@@ -14,7 +14,7 @@ if (!getToken()) {
 	window.location.href = '../views/login.html';
 }
 
-const { user } = getUserData();
+const { user_id } = getUserData();
 
 const url = window.location.href;
 const params = new URLSearchParams(new URL(url).search);
@@ -37,7 +37,7 @@ printPost(posts, 'posts-lists', true);
 printTags();
 printCategories('list-categories');
 printAvatarsFollowers('avatars-followers');
-loadAvatar(user, 'avatar-image');
-loadInfoUser(user);
+loadAvatar(user_id, 'avatar-image');
+loadInfoUser(user_id);
 notificatiosnRandom();
-reloadBookmarks(user, 1000, false);
+reloadBookmarks(1000, false);

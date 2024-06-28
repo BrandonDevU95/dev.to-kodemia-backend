@@ -7,9 +7,9 @@ import {
 	getPostById,
 	getPostsMoreReactions,
 } from '../api/postsAPI.js';
-import { getAvatarByUsername, getUserInfo } from '../api/usersAPI.js';
 
 import { getToken } from '../api/usersAPI.js';
+import { getUserInfo } from '../api/usersAPI.js';
 
 const token = getToken();
 
@@ -149,7 +149,7 @@ const printCategories = async (wrapperId) => {
 
 	categoriesArray.forEach(async (category) => {
 		const post = await getPostByCategory(category);
-		const tabElement = createTab(category, post._id);
+		const tabElement = createTab(category, post[0]._id);
 		wrapper.appendChild(tabElement);
 	});
 };
@@ -159,7 +159,7 @@ const printTrendingPosts = async (numPost, wrapperId) => {
 	const trendingPosts = await getPostsMoreReactions(numPost);
 
 	trendingPosts.forEach((trend) => {
-		const tabElement = createTab(trend.title, trend.key);
+		const tabElement = createTab(trend.title, trend._id);
 		wrapper.appendChild(tabElement);
 	});
 };
@@ -225,7 +225,7 @@ const createPostCard = async (post, index, notImg) => {
 	div7.classList.add('me-2');
 
 	const img = document.createElement('img');
-	const avatar = await getAvatarByUsername(post.author);
+	const { avatar } = await getUserInfo(post.author);
 	img.src = avatar;
 	img.alt = post.author.name;
 	img.classList.add('rounded-circle');
@@ -440,7 +440,7 @@ const createPostCard = async (post, index, notImg) => {
 	const btnIcon = document.createElement('button');
 	btnIcon.classList.add('btn', 'border-0', 'p-0');
 	btnIcon.setAttribute('type', 'button');
-	btnIcon.disabled = true;
+	// btnIcon.disabled = false;
 
 	const i = document.createElement('i');
 	i.id = post._id;
@@ -519,7 +519,7 @@ const createPostDetail = async (post) => {
 	avatar.classList.add('rounded-circle');
 	avatar.width = '46';
 	avatar.height = '46';
-	avatar.alt = post.author.name;
+	avatar.alt = post.author;
 	authorImage.appendChild(avatar);
 	lh1.appendChild(authorImage);
 

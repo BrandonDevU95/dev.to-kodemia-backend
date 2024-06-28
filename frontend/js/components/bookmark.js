@@ -9,8 +9,8 @@ import { printPost } from '../components/posts.js';
 
 let timeoutIdBookmarks;
 
-const loadBookmarks = async (icons, user) => {
-	const bookmarks = await getAllBookmarksByUser(user);
+const loadBookmarks = async (icons) => {
+	const bookmarks = await getAllBookmarksByUser();
 	if (bookmarks) {
 		icons.forEach((icon) => {
 			const isBookmarked = bookmarks.find(
@@ -25,7 +25,7 @@ const loadBookmarks = async (icons, user) => {
 	}
 };
 
-const bookmarkIcon = (icons, user, reload) => {
+const bookmarkIcon = (icons, reload) => {
 	icons.forEach((icon) => {
 		const parentElement = icon.parentNode;
 		parentElement.disabled = false;
@@ -33,7 +33,8 @@ const bookmarkIcon = (icons, user, reload) => {
 		icon.addEventListener('click', async () => {
 			if (icon.classList.contains('bi-bookmark')) {
 				parentElement.disabled = true;
-				const res = await saveBookmarkUser(user, icon.id);
+				console.log(icon.id);
+				const res = await saveBookmarkUser(icon.id);
 				if (res.name) {
 					icon.classList.add('bi-bookmark-check-fill');
 					icon.classList.add('text-warning');
@@ -44,13 +45,13 @@ const bookmarkIcon = (icons, user, reload) => {
 				}
 			} else if (icon.classList.contains('bi-bookmark-check-fill')) {
 				parentElement.disabled = true;
-				const res = await deleteBookmark(user, icon.id);
+				const res = await deleteBookmark(icon.id);
 				if (!res) {
 					icon.classList.remove('text-warning');
 					icon.classList.remove('bi-bookmark-check-fill');
 					icon.classList.add('bi-bookmark');
 					if (reload) {
-						const bookmarkPosts = await getBookmarkByUser(user);
+						const bookmarkPosts = await getBookmarkByUser();
 						if (!bookmarkPosts) {
 							printNoPosts(
 								'No tienes colecciones aún',
@@ -72,19 +73,19 @@ const bookmarkIcon = (icons, user, reload) => {
 	});
 };
 
-const reloadBookmarks = async (user, time, reload) => {
+const reloadBookmarks = async (time, reload) => {
 	clearTimeout(timeoutIdBookmarks);
 
 	timeoutIdBookmarks = setTimeout(async () => {
 		const icons = document.querySelectorAll('.bi-bookmark');
-		loadBookmarks(icons, user);
-		bookmarkIcon(icons, user, reload);
+		loadBookmarks(icons);
+		bookmarkIcon(icons, reload);
 	}, time || 1500);
 };
 
-const getBookmarkByUser = async (user) => {
+const getBookmarkByUser = async () => {
 	//Esta variable obtiene los objetos de la db bookmarks
-	const collectionsUser = await getAllBookmarksByUser(user);
+	const collectionsUser = await getAllBookmarksByUser();
 
 	if (collectionsUser.length === 0) return null;
 

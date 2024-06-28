@@ -1,10 +1,5 @@
 import { getBookmarkByUser, printNoPosts } from '../components/bookmark.js';
-import {
-	getToken,
-	getUserByUsername,
-	getUserData,
-	logout,
-} from '../api/usersAPI.js';
+import { getToken, getUserData, getUserInfo, logout } from '../api/usersAPI.js';
 import { loadInfoUser, notificatiosnRandom } from '../components/users.js';
 
 import { getPostsByUsername } from '../api/postsAPI.js';
@@ -24,7 +19,7 @@ const profileTab = document.getElementById('profile-tab');
 const postsTab = document.getElementById('posts-tab');
 const collectionsTab = document.getElementById('collections-tab');
 
-const { user } = getUserData();
+const { user, user_id } = getUserData();
 
 //No hay una funcion de entrada como en home, espera los eventos de los botones
 btnLogout.addEventListener('click', () => {
@@ -54,7 +49,7 @@ posts.addEventListener('click', async () => {
 	profileTab.classList.add('d-none');
 	collectionsTab.classList.add('d-none');
 
-	const postsUser = await getPostsByUsername(user);
+	const postsUser = await getPostsByUsername(user_id);
 
 	if (!postsUser) {
 		printNoPosts('No tienes post aún', 'posts-lists');
@@ -88,11 +83,11 @@ collections.addEventListener('click', async () => {
 
 //Funcion que carga los datos del usuario en el perfil desde el inicio
 (async () => {
-	const userObject = await getUserByUsername(user);
+	const userObject = await getUserInfo(user_id);
 	const fields = document.querySelectorAll(
 		'#form-profile input , #form-profile textarea'
 	);
-	loadInfoUser(user);
+	loadInfoUser(user_id);
 	notificatiosnRandom();
 
 	//Revisar esta funcion para que funcione con el avatar
@@ -107,7 +102,7 @@ collections.addEventListener('click', async () => {
 		email: userObject.email,
 		phone: userObject.phone,
 		address: `${userObject.address.street} - ${userObject.address.number}, ${userObject.address.city}, CP. ${userObject.address.zipcode}.`,
-		about: userObject.acerca,
+		about: userObject.about,
 	};
 
 	fields.forEach((field) => {
