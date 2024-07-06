@@ -75,4 +75,29 @@ api.post('/login', async (req, res) => {
 	}
 });
 
+api.post('/refresh-token', async (req, res) => {
+	const { refreshToken } = req.body;
+
+	if (!refreshToken) {
+		throw createError(400, 'Refresh token is required.');
+	}
+
+	try {
+		const newAccessToken = await authUsecase.refreshToken(refreshToken);
+
+		res.status(200).json({
+			success: true,
+			message: 'Token refreshed successfully',
+			accessToken: newAccessToken,
+		});
+	} catch (error) {
+		res.status(error.status || 500);
+
+		res.json({
+			succes: false,
+			error: error.message,
+		});
+	}
+});
+
 module.exports = api;
