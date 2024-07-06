@@ -65,7 +65,24 @@ async function login(username, password) {
 	};
 }
 
+async function refreshToken(refreshToken) {
+	const currentTime = Date.now();
+
+	const refreshTokenPayload = jwt.decodedToken(refreshToken);
+
+	if (!refreshTokenPayload || refreshTokenPayload.exp <= currentTime) {
+		throw createError(401, 'Invalid refresh token or token has expired');
+	}
+
+	const newAccessToken = jwt.generateToken({
+		_id: refreshTokenPayload.user_id,
+	});
+
+	return newAccessToken;
+}
+
 module.exports = {
 	signup,
 	login,
+	refreshToken,
 };
