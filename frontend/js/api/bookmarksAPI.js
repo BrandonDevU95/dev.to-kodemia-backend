@@ -1,4 +1,4 @@
-const URL_SERVER = 'http://localhost:3000/api';
+const URL_SERVER = 'https://dev-to-kodemia-backend.onrender.com/api';
 
 import { getToken } from './usersAPI.js';
 
