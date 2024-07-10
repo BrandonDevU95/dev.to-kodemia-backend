@@ -1,8 +1,4 @@
-import {
-	getNameByUsername,
-	getToken,
-	getUserData,
-} from '../js/api/usersAPI.js';
+import { getToken, getUserData } from '../js/api/usersAPI.js';
 
 import { createPost } from '../js/api/postsAPI.js';
 
@@ -68,14 +64,12 @@ btnPublish.addEventListener('click', async () => {
 	tipFooter.classList.add('d-none');
 
 	const { user } = await getUserData();
-	const name = await getNameByUsername(user);
 
 	let tagsArray = tags.value.split(',').map((tag) => tag.trim());
 	tagsArray = tagsArray.map((tag) => tag.replace(/\s+/g, ''));
 
 	const post = {
 		autor: {
-			name: name.firstname + ' ' + name.lastname,
 			username: user,
 		},
 		imagen: image.value,
