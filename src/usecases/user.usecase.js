@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const createError = require('http-errors');
+const { validateUserPartial } = require('../schemas/user.schema');
 
 async function getUserById(id) {
 	const user = await User.findById(id);
@@ -38,4 +39,28 @@ async function getAllAvatars() {
 	return avatars;
 }
 
-module.exports = { getUserById, getUserByUsername, getAllAvatars };
+async function updateUser(id, user) {
+	user.updated_at = new Date(user.updated_at);
+
+	const userValidated = validateUserPartial(user);
+
+	if (!userValidated.success) {
+		throw createError(400, JSON.parse(userValidated.error.message));
+	}
+
+	const userUpdated = await User.findByIdAndUpdate(
+		{ _id: id },
+		userValidated.data,
+		{
+			new: true,
+		}
+	);
+
+	if (!userUpdated) {
+		throw createError(404, 'User not found');
+	}
+
+	return userUpdated;
+}
+
+module.exports = { getUserById, getUserByUsername, getAllAvatars, updateUser };
